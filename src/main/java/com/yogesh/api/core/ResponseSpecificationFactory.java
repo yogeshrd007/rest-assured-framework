@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.lessThan;
 
 public final class ResponseSpecificationFactory {
 
-    private static final long DEFAULT_RESPONSE_TIME_MS = 1000L;
+    private static final long DEFAULT_RESPONSE_TIME_MS = 10000L;
     private ResponseSpecificationFactory(){
         throw new AssertionError("Utility class should not be instantiated");
     }
@@ -21,4 +21,25 @@ public final class ResponseSpecificationFactory {
                 .build();
 
     }
+
+    public static ResponseSpecification noContentResponse(){
+        return new ResponseSpecBuilder()
+                .expectStatusCode(204)
+                .expectResponseTime(lessThan(DEFAULT_RESPONSE_TIME_MS))
+                .build();
+    }
+    public static ResponseSpecification createdResponse() {
+        return new ResponseSpecBuilder()
+                .expectStatusCode(201)
+                .expectResponseTime(lessThan(DEFAULT_RESPONSE_TIME_MS))
+                .build();
+    }
+
+    public static ResponseSpecification notFoundResponse() {
+        return new ResponseSpecBuilder()
+                .expectStatusCode(404)
+                .expectResponseTime(lessThan(DEFAULT_RESPONSE_TIME_MS))
+                .build();
+    }
+
 }

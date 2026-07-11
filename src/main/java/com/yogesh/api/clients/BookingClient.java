@@ -2,10 +2,13 @@ package com.yogesh.api.clients;
 
 import com.yogesh.api.config.ConfigManager;
 import com.yogesh.api.core.RequestSpecificationFactory;
+import com.yogesh.api.core.TokenManager;
 import com.yogesh.api.models.BookingRequest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
@@ -56,5 +59,46 @@ public final class BookingClient {
                 .body(bookingRequest)
                 .when()
                 .post("/booking");
+    }
+
+    public static Response updateBooking(int bookingId, BookingRequest bookingRequest){
+        RequestSpecification requestSpecification=
+                RequestSpecificationFactory.getRequestSpecification();
+
+        return given()
+                .spec(requestSpecification)
+                .header("Cookie", "token=" + TokenManager.getToken())
+                .pathParam("id", bookingId)
+                .body(bookingRequest)
+                .when()
+                .put("/booking/{id}");
+
+    }
+
+    public static Response partialUpdateBooking(int bookingId,
+                                                Map<String, Object> updates){
+        RequestSpecification requestSpecification =
+                RequestSpecificationFactory.getRequestSpecification();
+
+        return given()
+                .spec(requestSpecification)
+                .header("Cookie", "token=" + TokenManager.getToken())
+                .pathParam("id", bookingId)
+                .body(updates)
+                .when()
+                .patch("/booking/{id}");
+    }
+
+    public static Response deleteBooking(int bookingId){
+        RequestSpecification requestSpecification =
+                RequestSpecificationFactory.getRequestSpecification();
+
+        return given()
+                .spec(requestSpecification)
+                .header("Cookie", "token=" + TokenManager.getToken())
+                .pathParam("id",bookingId)
+                .when()
+                .delete("/booking/{id}");
+
     }
 }
