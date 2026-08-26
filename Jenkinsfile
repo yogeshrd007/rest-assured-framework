@@ -22,10 +22,13 @@ pipeline {
             }
         }
 
-        stage('Reports') {
+        stage('Allure Report') {
             steps {
-                archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true
-                archiveArtifacts artifacts: 'allure-results/**', allowEmptyArchive: true
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    results: [[path: 'allure-results']]
+                ])
             }
         }
     }
