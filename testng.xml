@@ -17,7 +17,7 @@
             <class name="com.yogesh.api.tests.BookingTest">
 
                 <methods>
-                    <include name="shouldCreateBooking"/>
+                    <include name="shouldReturnAllBookings"/>
                 </methods>
 
             </class>
