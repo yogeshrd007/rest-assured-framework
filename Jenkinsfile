@@ -21,5 +21,12 @@ pipeline {
                 sh 'mvn test'
             }
         }
+
+        stage('Reports') {
+            steps {
+                archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'allure-results/**', allowEmptyArchive: true
+            }
+        }
     }
 }
