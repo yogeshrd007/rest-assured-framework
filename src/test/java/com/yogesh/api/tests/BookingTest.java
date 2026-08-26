@@ -1,10 +1,18 @@
 package com.yogesh.api.tests;
 
+import com.yogesh.api.assertions.BookingAssertions;
+import com.yogesh.api.assertions.ErrorAssertions;
 import com.yogesh.api.clients.BookingClient;
 import com.yogesh.api.core.ResponseSpecificationFactory;
+import com.yogesh.api.dataproviders.BookingDataProvider;
 import com.yogesh.api.models.BookingRequest;
 import com.yogesh.api.models.BookingResponse;
-import com.yogesh.api.testdata.BookingRequestBuilder;
+import com.yogesh.api.builders.BookingRequestBuilder;
+import com.yogesh.api.testdata.BookingDataFactory;
+import com.yogesh.api.validation.ResponseHeaderValidator;
+import com.yogesh.api.validation.ResponseSchemaValidator;
+import com.yogesh.api.validation.ResponseTimeValidator;
+import io.qameta.allure.*;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -12,6 +20,7 @@ import org.testng.annotations.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 public class BookingTest {
 
@@ -46,36 +55,44 @@ public class BookingTest {
         Assert.assertFalse(firstName.isBlank(), "First name should not be blank");
     }
 
-    @Test
-    public void shouldCreateBooking() {
+    @Epic("Booking API")
+    @Feature("Booking Management")
+    @Story("Create Booking")
+    @Owner("Yogesh")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Verify a new booking can be created successfully")
+    @Test (
+            dataProvider = "validBookings",
+            dataProviderClass = BookingDataProvider.class
+    )
+    public void shouldCreateBooking(BookingRequest bookingRequest) {
 
-        BookingRequest bookingRequest =
-                BookingRequestBuilder.validBooking().
-                        build();
 
         BookingResponse bookingResponse = createBookingSuccessfully(bookingRequest);
 
-        Assert.assertTrue(bookingResponse.getBookingid() > 0,
-                "booking id should be generated");
-
-        Assert.assertEquals(bookingResponse.getBooking().getFirstname(), bookingRequest.getFirstname());
-        Assert.assertEquals(bookingResponse.getBooking().getLastname(), bookingRequest.getLastname());
-        Assert.assertEquals(bookingResponse.getBooking().getTotalprice(), bookingRequest.getTotalprice());
-        Assert.assertEquals(bookingResponse.getBooking().isDepositpaid(), bookingRequest.isDepositpaid());
-        Assert.assertEquals(bookingResponse.getBooking().getBookingdates().getCheckin(),
-                bookingRequest.getBookingdates().getCheckin());
-        Assert.assertEquals(bookingResponse.getBooking().getBookingdates().getCheckout(),
-                bookingRequest.getBookingdates().getCheckout());
-        Assert.assertEquals(bookingResponse.getBooking().getAdditionalneeds(), bookingRequest.getAdditionalneeds());
-
+        BookingAssertions.verifyBookingDetails(bookingRequest,bookingResponse);
 
     }
 
+    @Step("Create a new booking successfully")
     private BookingResponse createBookingSuccessfully(BookingRequest bookingRequest) {
 
 
         Response response = BookingClient.createBooking(bookingRequest);
+
         response.then().spec(ResponseSpecificationFactory.okResponse());
+        ResponseSchemaValidator.validate(
+                response,
+                "schemas/booking-response-schema.json");
+
+        ResponseTimeValidator.verifyResponseTimeLessThan(response);
+
+        ResponseHeaderValidator.verifyHeaderContains(
+                response,
+                "Content-Type",
+                "application/json"
+        );
+
 
         return response.as(BookingResponse.class);
 
@@ -85,25 +102,18 @@ public class BookingTest {
     @Test
     public void shouldUpdateBooking() {
         BookingRequest createRequest =
-                BookingRequestBuilder.validBooking().
-                        build();
+                BookingDataFactory.validBooking();
 
         BookingResponse createdBooking =
                 createBookingSuccessfully(createRequest);
 
         int bookingId = createdBooking.getBookingid();
 
-        BookingRequest updateRequest = BookingRequestBuilder.validBooking()
-                .withFirstname("John")
-                .withLastname("Smith")
-                .withTotalPrice(999)
-                .withDepositPaid(false)
-                .withAdditionalNeeds("Lunch")
-                .withCheckin("2025-08-01")
-                .withCheckout("2025-08-14")
-                .build();
+        BookingRequest updateRequest = BookingDataFactory.validBooking();
 
         Response response = BookingClient.updateBooking(bookingId, updateRequest);
+
+
         response.then().spec(ResponseSpecificationFactory.okResponse());
 
         BookingRequest updatedBooking =
@@ -135,7 +145,7 @@ public class BookingTest {
     @Test
     public void shouldPartialUpdateBooking() {
 
-        BookingRequest createRequest = BookingRequestBuilder.validBooking().build();
+        BookingRequest createRequest = BookingDataFactory.validBooking();
 
         BookingResponse createdBooking = createBookingSuccessfully(createRequest);
         int bookingId = createdBooking.getBookingid();
@@ -175,7 +185,7 @@ public class BookingTest {
     @Test
     public void shouldDeleteBooking(){
         BookingRequest createRequest =
-                BookingRequestBuilder.validBooking().build();
+                BookingDataFactory.validBooking();
 
        BookingResponse createdBooking =createBookingSuccessfully(createRequest);
        int bookingId = createdBooking.getBookingid();
@@ -192,5 +202,35 @@ public class BookingTest {
 
 
     }
+
+    @Test
+    public void shouldRetryDemo() {
+        System.out.println("Executing shouldRetryDemo");
+        Assert.fail("Intentional Failure");
+    }
+
+
+    @Test(
+     dataProvider = "negativeBookings",
+     dataProviderClass = BookingDataProvider.class
+    )
+    public void exploreNegativeBookings(
+            BookingRequest bookingRequest,
+            String scenario,
+            int expectedStatusCode) {
+
+
+        Response response = BookingClient.createBooking(bookingRequest);
+
+        ErrorAssertions.verifyErrorResponse(
+                response,
+                500,
+                "text/plain"
+        );
+
+    }
+
+
+
 
 }

@@ -17,6 +17,7 @@ public final class ConfigValidator {
 
         validateInteger(properties, "timeout");
         validateInteger(properties, "retry.count");
+        validateInteger(properties, "response.time.threshold");
     }
 
     private static void validateRequiredProperty(Properties properties, String key){

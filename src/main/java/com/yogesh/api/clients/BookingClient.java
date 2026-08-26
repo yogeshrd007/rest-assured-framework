@@ -1,6 +1,8 @@
 package com.yogesh.api.clients;
 
 import com.yogesh.api.config.ConfigManager;
+import com.yogesh.api.core.AuthenticationManager;
+import com.yogesh.api.core.RequestExecutor;
 import com.yogesh.api.core.RequestSpecificationFactory;
 import com.yogesh.api.core.TokenManager;
 import com.yogesh.api.models.BookingRequest;
@@ -21,84 +23,75 @@ public final class BookingClient {
         RequestSpecification requestSpecification =
                 RequestSpecificationFactory.getRequestSpecification();
 
-        return given()
+        return RequestExecutor.execute(()-> given()
                 .spec(requestSpecification)
                 .when()
-                .get("/booking");
+                .get("/booking"));
     }
 
     public static Response getBookings(String firstName){
         RequestSpecification requestSpecification=
                 RequestSpecificationFactory.getRequestSpecification();
 
-        return given()
+        return RequestExecutor.execute(()-> given()
                 .spec(requestSpecification)
                 .queryParam("firstname",firstName)
                 .when()
-                .get("/booking");
+                .get("/booking"));
 
     }
 
     public static Response getBooking(int bookingId) {
 
-        return given()
+        return RequestExecutor.execute(()-> given()
                 .baseUri(ConfigManager.getBaseUrl())
                 // Restful Booker returns 418 when Accept: application/json is sent.
                 .pathParam("id", bookingId)
                 .when()
-                .get("/booking/{id}");
+                .get("/booking/{id}"));
     }
 
     public static Response createBooking(BookingRequest bookingRequest){
         RequestSpecification requestSpecification=
                 RequestSpecificationFactory.getRequestSpecification();
 
-        return given()
+        return RequestExecutor.execute(()-> given()
                 .spec(requestSpecification)
                 .header("Accept", "*/*")
                 .body(bookingRequest)
                 .when()
-                .post("/booking");
+                .post("/booking"));
     }
 
     public static Response updateBooking(int bookingId, BookingRequest bookingRequest){
-        RequestSpecification requestSpecification=
-                RequestSpecificationFactory.getRequestSpecification();
 
-        return given()
-                .spec(requestSpecification)
-                .header("Cookie", "token=" + TokenManager.getToken())
+        return RequestExecutor.execute(()-> given()
+                .spec( AuthenticationManager.getAuthenticatedRequestSpecification())
                 .pathParam("id", bookingId)
                 .body(bookingRequest)
                 .when()
-                .put("/booking/{id}");
+                .put("/booking/{id}"));
 
     }
 
     public static Response partialUpdateBooking(int bookingId,
                                                 Map<String, Object> updates){
-        RequestSpecification requestSpecification =
-                RequestSpecificationFactory.getRequestSpecification();
 
-        return given()
-                .spec(requestSpecification)
-                .header("Cookie", "token=" + TokenManager.getToken())
+        return RequestExecutor.execute(()-> given()
+                .spec( AuthenticationManager.getAuthenticatedRequestSpecification())
                 .pathParam("id", bookingId)
                 .body(updates)
                 .when()
-                .patch("/booking/{id}");
+                .patch("/booking/{id}"));
     }
 
     public static Response deleteBooking(int bookingId){
-        RequestSpecification requestSpecification =
-                RequestSpecificationFactory.getRequestSpecification();
 
-        return given()
-                .spec(requestSpecification)
-                .header("Cookie", "token=" + TokenManager.getToken())
+        return RequestExecutor.execute(()-> given()
+                .spec( AuthenticationManager.getAuthenticatedRequestSpecification())
                 .pathParam("id",bookingId)
                 .when()
-                .delete("/booking/{id}");
+                .delete("/booking/{id}"));
 
     }
 }

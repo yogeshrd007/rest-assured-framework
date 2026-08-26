@@ -37,3 +37,12 @@ build/
 
 ### Mac OS ###
 .DS_Store
+# Test and reporting artifacts
+allure-results/
+logs/
+reports/
+
+# Test and reporting artifacts
+allure-results/
+logs/
+reports/

@@ -1,9 +1,10 @@
-package com.yogesh.api.testdata;
+package com.yogesh.api.builders;
 
 import com.yogesh.api.models.BookingDates;
 import com.yogesh.api.models.BookingRequest;
+import io.qameta.allure.Step;
 
-public class BookingRequestBuilder {
+public final class BookingRequestBuilder {
 
     private final BookingRequest bookingRequest;
 
@@ -14,15 +15,9 @@ public class BookingRequestBuilder {
         bookingRequest.setBookingdates(bookingDates);
     }
 
-    public static BookingRequestBuilder validBooking(){
-        return new BookingRequestBuilder()
-                .withFirstname("Jim")
-                .withLastname("Brown")
-                .withTotalPrice(111)
-                .withDepositPaid(true)
-                .withCheckin("2025-07-01")
-                .withCheckout("2025-07-10")
-                .withAdditionalNeeds("Breakfast");
+
+    public static BookingRequestBuilder builder(){
+        return new BookingRequestBuilder();
     }
 
     public BookingRequestBuilder withFirstname(String firstname){
@@ -61,6 +56,7 @@ public class BookingRequestBuilder {
         return this;
     }
 
+    @Step("Build a booking request")
     public BookingRequest build(){
         return bookingRequest;
     }

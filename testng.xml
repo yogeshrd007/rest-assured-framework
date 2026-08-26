@@ -4,10 +4,24 @@
 
 <suite name="API Test Suite">
 
-    <test name="Health Check Tests">
+    <listeners>
+        <listener class-name="com.yogesh.api.listeners.ExtentReportListener"/>
+        <listener class-name="com.yogesh.api.listeners.RetryListener"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
+    <test name="Retry Tests">
 
         <classes>
-            <class name="com.yogesh.api.tests.HealthCheckTest"/>
+
+            <class name="com.yogesh.api.tests.BookingTest">
+
+                <methods>
+                    <include name="shouldCreateBooking"/>
+                </methods>
+
+            </class>
+
         </classes>
 
     </test>

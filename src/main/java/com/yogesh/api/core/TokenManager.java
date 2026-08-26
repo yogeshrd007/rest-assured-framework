@@ -4,7 +4,8 @@ import com.yogesh.api.clients.AuthClient;
 
 public final class TokenManager {
 
-    private static String token;
+    private static volatile String token;
+    private static final Object LOCK = new Object();
 
     private TokenManager(){
         throw new AssertionError("Utility class should not be instantiated");
@@ -12,9 +13,19 @@ public final class TokenManager {
 
     public static String getToken(){
         if(token==null){
-            token = AuthClient.generateToken();
+            synchronized (LOCK){
+              if(token==null){
+                  token = AuthClient.generateToken();
+              }
+            }
+
         }
         return token;
+    }
+    public static void clearToken() {
+        synchronized (LOCK){
+            token = null;
+        }
     }
 
 }

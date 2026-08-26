@@ -1,6 +1,7 @@
 package com.yogesh.api.core;
 
 import com.yogesh.api.config.ConfigManager;
+import com.yogesh.api.filters.RequestResponseLoggingFilter;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
@@ -16,6 +17,7 @@ public final class RequestSpecificationFactory {
                 .setBaseUri(ConfigManager.getBaseUrl())
                 .setContentType(ContentType.JSON)
                 .setAccept("*/*")
+                .addFilter(new RequestResponseLoggingFilter())
                 .build();
     }
 }

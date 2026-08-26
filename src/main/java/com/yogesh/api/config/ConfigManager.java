@@ -28,14 +28,32 @@ public final class ConfigManager {
     }
 
     public static String getUsername() {
+
+        String username = System.getenv("API_USERNAME");
+
+        if(username != null && !username.isBlank()){
+            return username;
+        }
         return PROPERTIES.getProperty("username");
     }
 
     public static String getPassword() {
+        String password = System.getenv("API_PASSWORD");
+
+        if (password != null && !password.isBlank()) {
+            return password;
+        }
+
         return PROPERTIES.getProperty("password");
     }
 
     public static int getInt(String key) {
         return Integer.parseInt(PROPERTIES.getProperty(key));
+    }
+
+    public static int getResponseTimeThreshold() {
+        return Integer.parseInt(
+                PROPERTIES.getProperty("response.time.threshold")
+        );
     }
 }
